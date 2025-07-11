@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: dbt_postgres
+    environment:
+      POSTGRES_USER: ${DBT_USER}
+      POSTGRES_PASSWORD: ${DBT_PASSWORD}
+      POSTGRES_DB: dbt_db
+    ports:
+      - "5433:5432" #utilizar porta 5433 no ambiente local e 5432 no container
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DBT_USER} - dbt_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  
+volumes:
+  postgres_data:
