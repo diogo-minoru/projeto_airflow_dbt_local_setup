@@ -1,58 +1,71 @@
-# Data Pipeline: Cotação do Bitcoin com PostgreSQL, Python, dbt e Airflow
+# Data Pipeline: PostgreSQL, Python, dbt e Airflow
 
-Este projeto implementa um pipeline de dados completo para ingestão, tratamento e orquestração de dados da cotação diária do Bitcoin. Utiliza as melhores práticas de engenharia de dados, como containerização, ingestão programática com Python, modelagem em camadas com o **esquema Medallion (bronze → silver → gold)** via `dbt`, e automação com **Apache Airflow**.
-
----
-
-## Visão Geral do Pipeline
-
-1. **Banco de Dados PostgreSQL** com Docker Compose  e **Ingestão de dados via API** com Python (`requests` + `pandas`)  
-2. **Modelagem dos dados com dbt** e o esquema Medallion  
-3. **Orquestração completa com Apache Airflow**
-
----
+Este projeto implementa um pipeline de dados completo para ingestão, tratamento e orquestração de dados. Utilizando as melhores práticas de engenharia de dados, como containerização, ingestão programática com Python, modelagem em camadas com o **esquema Medallion (bronze → silver → gold)** via `dbt`, e automação com **Apache Airflow**.
 
 ## Estrutura do Projeto
+O projeto foi estruturado em três etapas:
+
+1. **Banco de Dados PostgreSQL** com Docker Compose  e **Ingestão de dados via SQLAlchemy** com Python. [Repositório Etapa 1](https://github.com/diogo-minoru/projeto_airflow_dbt_local_setup)
+2. **Modelagem dos dados com dbt** e o esquema Medallion. [Repositório Etapa 2](https://github.com/diogo-minoru/projeto_airflow_dbt_data_warehouse)
+3. **Orquestração completa com Apache Airflow.** [Repositório Etapa 3](https://github.com/diogo-minoru/projeto_airflow_dbt_airflow)
+4. Análise dos dados com Power BI. [Dashboard] ()
 
 ## Etapa 1 - Banco de Dados com Docker Compose + Ingestão dos dados
 
-O banco de dados PostgreSQL é definido no `docker-compose.yml`. Para subir o ambiente:
+Primeira Etapa – Migração de Dados
+Esta etapa simula um cenário real de migração de dados, onde as informações de um banco de dados de produção são transferidas para outro banco de dados destinado a atuar como Data Warehouse.
+
+Para esta simulação, considerou-se um ambiente onde o banco de dados de produção é um SQL Server, e os dados são migrados para um banco de dados PostgreSQL, utilizando a biblioteca SQLAlchemy do Python para estabelecer a conexão e realizar a transferência.
+
+![Imagem](/1_local_setup/imagem1.png)
+
+Para realizar a migração, foi criada a classe `SqlServerToPostgresMigrator`, localizada no arquivo `migrate_sqlserver.py`. Essa classe é responsável pela lógica de transferência dos dados e é utilizada por outros módulos presentes na pasta `consultas`.
+
+**Estrutura das pastas:**
+```bash
+1_local_setup/
+├── src/
+│   └── migrate_sqlserver.py
+│   └── test_connection.py
+├── consultas/
+│   └── currencyexchange.py
+│   └── customers.py
+│   └── orderrows.py
+│   └── orders.py
+│   └── store.py
+└── docker-compose.yml
+```
+
+O banco de dados PostgreSQL é definido no `docker-compose.yml`, criando um novo banco com nome **dbt_db**
+
+```yml
+services:
+  postgres:
+    image: postgres:latest
+    container_name: dbt_postgres
+    environment:
+      POSTGRES_USER: ${DBT_USER}
+      POSTGRES_PASSWORD: ${DBT_PASSWORD}
+      POSTGRES_DB: dbt_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DBT_USER} - dbt_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  
+volumes:
+  postgres_data:
+```
+
+Para subir o ambiente:
 
 ```bash
 docker-compose up -d
 ```
+Com o docker em execução, é possível executar os códigos para copiar as tabelas que estão no SQL Server para o Postgre SQL.
 
-O script Python realiza:
-
-Requisição para uma API pública de cotação do Bitcoin, salvando os dados em arquivo CSV no diretório dbt_project/seeds/
-
-### Extração dos campos:
-
-|datetime    | open     | high     | low      | close    |
-|:---:       |:---:     |:---:     |:---:     |:---:     |
-|2025-07-14  |119086.65 |123218    |118905.18 |120610.02 |
-|2025-07-13  |117420    |119488    |117224.79 |119086.64 |
-|2025-07-12  |117527.66 |118200    |116900.05 |117420    |
-|2025-07-11  |116010.01 |118869.98 |115222.22 |117527.66 |
-|2025-07-10  |111234    |	116868 |110500    |116010    |
-
-
-
-## Etapa 2 - Transformação com dbt
-
-Com os dados no diretório seeds, o comando dbt build irá:
-
-1. Carregar os dados do CSV para o banco (seed)
-2. Criar modelos de transformação com o esquema:
-
-    - bronze → dados brutos
-    - silver → dados limpos e validados
-    - gold → métricas agregadas e preparadas para análise
-
-## Etapa 3 - Orquestração com Apache Airflow
-A DAG no Airflow realiza a orquestração automática do pipeline:
-
-- start_pipeline: início da DAG
-- fetch_data: executa o script Python para coletar e salvar os dados
-- dbt_seed: insere os dados no PostgreSQL via dbt seed
-- dbt_build: executa os modelos dbt em sequência (bronze → silver → gold)
+[Repositório Etapa 2](https://github.com/diogo-minoru/projeto_airflow_dbt_data_warehouse)
