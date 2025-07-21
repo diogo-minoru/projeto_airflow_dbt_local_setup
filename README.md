@@ -17,7 +17,7 @@ Esta etapa simula um cenário real de migração de dados, onde as informações
 
 Para esta simulação, considerou-se um ambiente onde o banco de dados de produção é um SQL Server, e os dados são migrados para um banco de dados PostgreSQL, utilizando a biblioteca SQLAlchemy do Python para estabelecer a conexão e realizar a transferência.
 
-![Imagem](/1_local_setup/imagem1.png)
+![Imagem](imagem1.png)
 
 Para realizar a migração, foi criada a classe `SqlServerToPostgresMigrator`, localizada no arquivo `migrate_sqlserver.py`. Essa classe é responsável pela lógica de transferência dos dados e é utilizada por outros módulos presentes na pasta `consultas`.
 
