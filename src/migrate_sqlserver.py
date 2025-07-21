@@ -3,7 +3,7 @@ from sqlalchemy import String, Float, TIMESTAMP, BigInteger, Integer, Numeric
 import time
 
 class SqlServerToPostgresMigrator:
-    def __init__(self, sqlserver_engine, pg_engine, schema_pg: str = 'bronze'):
+    def __init__(self, sqlserver_engine, pg_engine, schema_pg: str = 'public'):
         self.sqlserver_engine = sqlserver_engine
         self.pg_engine = pg_engine
         self.schema_pg = schema_pg
