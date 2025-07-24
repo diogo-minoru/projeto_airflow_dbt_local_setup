@@ -8,7 +8,7 @@ O projeto foi estruturado em três etapas:
 1. **Banco de Dados PostgreSQL** com Docker Compose  e **Ingestão de dados via SQLAlchemy** com Python. [Repositório Etapa 1](https://github.com/diogo-minoru/projeto_airflow_dbt_local_setup)
 2. **Modelagem dos dados com dbt** e o esquema Medallion. [Repositório Etapa 2](https://github.com/diogo-minoru/projeto_airflow_dbt_data_warehouse)
 3. **Orquestração completa com Apache Airflow.** [Repositório Etapa 3](https://github.com/diogo-minoru/projeto_airflow_dbt_airflow)
-4. Análise dos dados com Power BI. [Dashboard] ()
+4. Análise dos dados com Power BI. [Dashboard] (https://app.powerbi.com/view?r=eyJrIjoiNmVmYzNlYTEtZDRjNi00YThhLWIwMGMtMzFmYTE4NDNmNzU1IiwidCI6Ijg4NTA2YTc5LWZlYTctNDAwYS1hOTc4LTc1ZjAxMGYzMDcxZiJ9)
 
 ## Etapa 1 - Banco de Dados com Docker Compose + Ingestão dos dados
 
